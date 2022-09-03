@@ -2,11 +2,14 @@ const { useState } = React;
 
 function App() {
   const [todos,setTodos]= useState([
-    {id:1, content:'今天要刷牙1', completed:false},
-    {id:2, content:'今天要洗臉2', completed:true},
-    {id:3, content:'今天要漱口3', completed:false},
+    {id:1, content:'把冰箱發霉的檸檬拿去丟', completed:false},
+    {id:2, content:'打電話叫媽媽匯款給我', completed:false},
+    {id:3, content:'整理電腦資料夾', completed:false},
+    {id:4, content:'繳電費水費瓦斯費', completed:false},
+    {id:5, content:'約vicky禮拜三泡溫泉', completed:false},
   ]);
-  const [value,setValue] = useState("");
+  const [value,setValue] = useState(""); // todo input
+  const [tabState,setTabState] = useState("all"); // tab state
   
   function addTodo(e){
     e.preventDefault();
@@ -41,6 +44,12 @@ function App() {
     setTodos([...todos]);
   }
 
+  // change tab state
+  function changeTab(e, state){
+    e.preventDefault();
+    setTabState(state);
+  }
+
   // TodoItem 元件
   function TodoItem(props){
     const {todo} = props;
@@ -66,9 +75,25 @@ function App() {
   const todoListRender = () => {
     // todo 有值
     if(todos.length){
-      const todolist = todos.map((item, i)=>{
-        return <TodoItem key={i} todo={item} />
-      })
+      let todolist = [];
+
+      if (tabState === 'all') {
+        // 全部
+        todolist = todos.map((item, i)=>{
+          return <TodoItem key={i} todo={item} />
+        })
+      } else if(tabState === 'undone') {
+        // 待完成
+        todolist = todos.filter(item=>!item.completed).map((item, i)=>{
+          return <TodoItem key={i} todo={item} />
+        })
+      } else {
+        // 已完成
+        todolist = todos.filter(item=>item.completed).map((item, i)=>{
+          return <TodoItem key={i} todo={item} />
+        })
+      }
+
       return todolist
     } 
     
@@ -106,9 +131,9 @@ function App() {
             </div>
             <div className="todoList_list">
               <ul className="todoList_tab">
-                  <li><a href="#" className="active">全部</a></li>
-                  <li><a href="#">待完成</a></li>
-                  <li><a href="#">已完成</a></li>
+                  <li><a href="#" className={tabState === 'all'? 'active':''} onClick={(e)=>changeTab(e,'all')}>全部</a></li>
+                  <li><a href="#" className={tabState === 'undone'? 'active':''} onClick={(e)=>changeTab(e,'undone')}>待完成</a></li>
+                  <li><a href="#" className={tabState === 'completed'? 'active':''} onClick={(e)=>changeTab(e,'completed')}>已完成</a></li>
               </ul>
               <div className="todoList_items">
                 <ul className="todoList_item">
