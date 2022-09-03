@@ -1,31 +1,49 @@
 const { useState } = React;
 
-// function App(){
-//   return (
-//     <>
-//       <input value={value} type="text" onChange={(e)=> setValue(e.target.value)} />
-//       <input type="button" value="儲存" onClick={addTodo} />
-//       <ul>
-//         {
-//           todo.map((item,i)=> <li key={i}>{item}</li>)
-//         }
-//       </ul>
-//     </>
-//   )
-// }
 function App() {
-  const [todo,setTodo]= useState([
-    {content:'今天要刷牙1', finished:false},
-    {content:'今天要刷牙2', finished:false},
-    {content:'今天要刷牙3', finished:false},
+  const [todos,setTodos]= useState([
+    {id:1, content:'今天要刷牙1', completed:false},
+    {id:2, content:'今天要洗臉2', completed:true},
+    {id:3, content:'今天要漱口3', completed:false},
   ]);
   const [value,setValue] = useState("");
   
-  function addTodo(){
-    setTodo([...todo,value]);
+  function addTodo(e){
+    e.preventDefault();
+    if(value.trim() === "") {
+      setValue('');
+      return
+    };
+    const newTodo = {
+      id: Date.now(),
+      content: value.trim(),
+      completed: false,
+    }
+    // console.log(newTodo);
+    setTodos([newTodo, ...todos]);
+    setValue('');
+    document.getElementById("todoInput").focus();
   }
 
+  function removeTodo(e, todo){
+    e.preventDefault();
+    setTodos(todos.filter(item=>item !== todo));
+  }
+
+  function removeCompletedAll(e){
+    e.preventDefault();
+    setTodos(todos.filter(item=>!item.completed));
+  }
+
+  // toggle todo completed
+  function toggleTodo(todo){
+    todo.completed = !todo.completed;
+    setTodos([...todos]);
+  }
+
+  // TodoItem 元件
   function TodoItem(props){
+    const {todo} = props;
     return (
       <li>
         <label className="todoList_label">
@@ -33,10 +51,12 @@ function App() {
             className="todoList_input"
             type="checkbox"
             value="true"
+            defaultChecked={todo.completed}
+            onChange={()=>toggleTodo(todo)}
           />
-          <span>{props.content}</span>
+          <span>{todo.content}</span>
         </label>
-        <a href="#">
+        <a href="#" onClick={(e)=>removeTodo(e, todo)}>
           <i className="fa fa-times"></i>
         </a>
       </li>
@@ -45,9 +65,9 @@ function App() {
 
   const todoListRender = () => {
     // todo 有值
-    if(todo.length){
-      const todolist = todo.map((item, i)=>{
-        return <TodoItem key={i} content={item.content}/>
+    if(todos.length){
+      const todolist = todos.map((item, i)=>{
+        return <TodoItem key={i} todo={item} />
       })
       return todolist
     } 
@@ -79,22 +99,24 @@ function App() {
         <div className="conatiner todoListPage vhContainer">
           <div className="todoList_Content">
             <div className="inputBox">
-              <input value={value} onChange={(e)=>{setValue(e.target.value)}} type="text" placeholder="請輸入待辦事項" />
-              <a href="#">
+              <input id="todoInput" value={value} onChange={(e)=>{setValue(e.target.value)}} type="text" placeholder="請輸入待辦事項" />
+              <a href="#" onClick={addTodo}>
                 <i className="fa fa-plus"></i>
               </a>
             </div>
             <div className="todoList_list">
               <ul className="todoList_tab">
-                
+                  <li><a href="#" className="active">全部</a></li>
+                  <li><a href="#">待完成</a></li>
+                  <li><a href="#">已完成</a></li>
               </ul>
               <div className="todoList_items">
                 <ul className="todoList_item">
                   { todoListRender() }
                 </ul>
                 <div className="todoList_statistics">
-                  <p> 5 個已完成項目</p>
-                  <a href="#">清除已完成項目</a>
+                  <p> {todos.filter(i=>!i.completed).length} 個待完成項目</p>
+                  <a href="#" onClick={removeCompletedAll}>清除已完成項目</a>
                 </div>
               </div>
             </div>

@@ -509,7 +509,6 @@ nav ul a span {
   border-radius: 6px;
   font-size: 14px;
   color: #333333;
-  transition-duration: 0.4s;
 }
 
 .todoList_list .todoList_items li:hover a {
